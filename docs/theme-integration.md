@@ -1,6 +1,6 @@
 # Hanlo 装备页适配指南
 
-插件 2.0.0 要求 **Halo 2.26.0 或更新版本**。本文只说明如何修改主题；本次开发没有修改或部署主题源码。
+`han-equipment` 2.0.0 要求 **Halo 2.26.0 或更新版本**。本文说明主题接入方式；插件不会自动修改主题源码。
 
 ## 为什么主题需要适配
 
@@ -8,11 +8,7 @@
 
 当前 Hanlo 模板只读取 `displayName`、`cover`、`specification`、`description`、`url`，并把规格限制为单行、描述限制为三行。更新插件后，后台能保存结构化参数，但这个旧模板不会自动展示新字段。
 
-当前实际主题源码位于：
-
-```text
-/home/hanserwei/halo-project/halo/hanlo-theme/src/equipments.html
-```
+在 Hanlo 主题根目录编辑 `src/equipments.html`。
 
 修改 `src/` 源文件，再通过主题构建生成 `templates/`；不要只修改生成目录。
 
@@ -26,7 +22,7 @@
 
 ```html
 <link rel="stylesheet"
-      th:href="@{/plugins/equipment/assets/static/equipment.css(v='2.0.0')}">
+      th:href="@{/plugins/han-equipment/assets/static/equipment.css(v='2.0.0')}">
 ```
 
 原有 Open Graph 片段继续保留。`v` 用于更新缓存；以后插件样式更新时同步改为对应版本。
@@ -46,7 +42,7 @@
 替换为：
 
 ```html
-<th:block th:replace="~{plugin:equipment:modules/equipment :: list(groups=${groups})}"></th:block>
+<th:block th:replace="~{plugin:han-equipment:modules/equipment :: list(groups=${groups})}"></th:block>
 ```
 
 这个片段消费 `/equipments` 路由已提供的 `groups`，不需要增加浏览器 API 请求或 JavaScript。
@@ -64,7 +60,7 @@
         buttonUrl='',
         buttonTitle='')}"></div>
 
-    <th:block th:replace="~{plugin:equipment:modules/equipment :: list(groups=${groups})}"></th:block>
+    <th:block th:replace="~{plugin:han-equipment:modules/equipment :: list(groups=${groups})}"></th:block>
 </div>
 ```
 
@@ -72,12 +68,12 @@
 
 ### 构建与安装顺序
 
-1. 将 Halo 升级到满足插件要求的版本，然后安装本项目构建的 `plugin-equipment-2.0.0.jar` 并启用。
-2. 在 Halo Console 的“装备”中创建分组，再填写装备信息和参数。
+1. 将 Halo 升级到满足插件要求的版本，停用旧 `equipment` 插件，然后安装本项目构建的 `han-equipment-2.0.0.jar` 并启用。两个插件共享 `/equipments` 路由，不应同时启用。
+2. 在 Halo Console 的“Han 装备”中创建分组，再填写装备信息和参数。
 3. 按以上两处修改主题，执行主题已有的 `pnpm build`，生成并安装新的主题包。
 4. `/equipments` 会使用主题外壳和插件新卡片。仅更新插件、不改主题模板时，旧主题仍然只显示原有字段。
 
-本次没有执行上述安装、部署或实机验证步骤。
+如果此前已经接入 `plugin:equipment:...` 或 `/plugins/equipment/...`，需要将插件名称段替换为 `han-equipment`。新的 API 分组是 `equipment.hanserwei.github.io`，不会自动读取旧插件的数据。
 
 ## 新增字段与模板契约
 
@@ -96,6 +92,8 @@
 | `url` | 可选链接 | 产品详情、介绍文章等 |
 | `groupName` | 分组资源名称 | 所属分组 |
 
+在自定义页面主动查询时使用 `hanEquipmentFinder`，例如 `${hanEquipmentFinder.groupBy()}`。`/equipments` 页面直接使用路由提供的 `groups` 即可。
+
 Finder / 路由返回的 `EquipmentVo` 另提供三个展示属性：
 
 - `equipment.deviceTypeLabel`：中文设备类型。
@@ -106,13 +104,13 @@ Finder / 路由返回的 `EquipmentVo` 另提供三个展示属性：
 
 ```html
 <!-- 完整分组列表，含空状态 -->
-<th:block th:replace="~{plugin:equipment:modules/equipment :: list(groups=${groups})}"></th:block>
+<th:block th:replace="~{plugin:han-equipment:modules/equipment :: list(groups=${groups})}"></th:block>
 
 <!-- 单张卡片，需要置于 .equipment-showcase 内，使用同一份 CSS -->
-<th:block th:replace="~{plugin:equipment:modules/card :: card(equipment=${equipment})}"></th:block>
+<th:block th:replace="~{plugin:han-equipment:modules/card :: card(equipment=${equipment})}"></th:block>
 
 <!-- 单个类型图标 -->
-<th:block th:replace="~{plugin:equipment:modules/icon :: icon(type=${equipment.spec.deviceType})}"></th:block>
+<th:block th:replace="~{plugin:han-equipment:modules/icon :: icon(type=${equipment.spec.deviceType})}"></th:block>
 ```
 
 ## 如果希望由主题独立设计卡片

@@ -26,7 +26,7 @@ public class EquipmentGroupQueryEndpoint implements CustomEndpoint {
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        final var tag = "api.equipment.kunkunyu.com/v1alpha1/EquipmentGroup";
+        final var tag = "api.equipment.hanserwei.github.io/v1alpha1/EquipmentGroup";
         return route()
             .GET("equipmentgroups", this::listGroups,
                 builder -> {
@@ -43,7 +43,7 @@ public class EquipmentGroupQueryEndpoint implements CustomEndpoint {
 
     @Override
     public GroupVersion groupVersion() {
-        return GroupVersion.parseAPIVersion("api.equipment.kunkunyu.com/v1alpha1");
+        return GroupVersion.parseAPIVersion("api.equipment.hanserwei.github.io/v1alpha1");
     }
 
     private Mono<ServerResponse> listGroups(ServerRequest request) {

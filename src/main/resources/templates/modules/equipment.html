@@ -13,7 +13,7 @@
         </div>
         <div class="equipment-grid">
             <th:block th:each="equipment : ${group.equipments}">
-                <th:block th:replace="~{plugin:equipment:modules/card :: card(equipment=${equipment})}"></th:block>
+                <th:block th:replace="~{plugin:han-equipment:modules/card :: card(equipment=${equipment})}"></th:block>
             </th:block>
         </div>
     </section>

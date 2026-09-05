@@ -3,7 +3,7 @@ plugins {
     id "com.github.node-gradle.node" version "7.1.0"
 }
 
-group 'com.kunkunyu.equipment.ui'
+group 'io.github.hanserwei.ui'
 
 node {
     pnpmVersion = '11.25.0'
@@ -32,8 +32,16 @@ tasks.register('pnpmCheck', PnpmTask) {
     dependsOn tasks.named('pnpmInstall')
 }
 
+tasks.register('pnpmLint', PnpmTask) {
+    group = 'verification'
+    description = 'Lint the Console extension'
+    args = ['lint']
+    dependsOn tasks.named('pnpmInstall')
+}
+
 tasks.named('check') {
     dependsOn tasks.named('pnpmCheck')
+    dependsOn tasks.named('pnpmLint')
 }
 
 tasks.named('assemble') {

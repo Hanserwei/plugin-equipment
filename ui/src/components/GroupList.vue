@@ -32,9 +32,9 @@ const selectedGroup = useRouteQuery<string>("equipment-group");
 const groups = ref<EquipmentGroup[]>([]);
 
 const { refetch, isLoading } = useQuery<EquipmentGroup[]>({
-  queryKey: ["plugin:equipment:groups"],
+  queryKey: ["plugin:han-equipment:groups"],
   queryFn: async () => {
-    const { data } = await axiosInstance.get<EquipmentGroupList>("/apis/console.api.equipment.kunkunyu.com/v1alpha1/equipmentgroups");
+    const { data } = await axiosInstance.get<EquipmentGroupList>("/apis/console.api.equipment.hanserwei.github.io/v1alpha1/equipmentgroups");
     return data.items
       .map((group) => {
         if (group.spec) {
@@ -77,7 +77,7 @@ const handleSaveInBatch = async () => {
       if (group.spec) {
         group.spec.priority = index;
       }
-      return axiosInstance.put(`/apis/equipment.kunkunyu.com/v1alpha1/equipmentgroups/${group.metadata.name}`, group);
+      return axiosInstance.put(`/apis/equipment.hanserwei.github.io/v1alpha1/equipmentgroups/${group.metadata.name}`, group);
     });
     if (promises) {
       await Promise.all(promises);
@@ -96,7 +96,7 @@ const handleDelete = async (group: EquipmentGroup) => {
     confirmType: "danger",
     onConfirm: async () => {
       try {
-        await axiosInstance.delete(`/apis/console.api.equipment.kunkunyu.com/v1alpha1/equipmentgroups/${group.metadata.name}`);
+        await axiosInstance.delete(`/apis/console.api.equipment.hanserwei.github.io/v1alpha1/equipmentgroups/${group.metadata.name}`);
         refetch();
       } catch (e) {
         console.error("Failed to delete equipment group", e);
@@ -193,7 +193,7 @@ function onGroupEditingModalClose() {
       <Transition appear name="fade">
         <!-- @unocss-skip-start -->
         <VButton
-          v-permission="['plugin:equipment:manage']"
+          v-permission="['plugin:han-equipment:manage']"
           block
           type="secondary"
           @click="handleOpenEditingModal(undefined)"

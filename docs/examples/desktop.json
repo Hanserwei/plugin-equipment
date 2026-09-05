@@ -1,5 +1,5 @@
 {
-  "apiVersion": "equipment.kunkunyu.com/v1alpha1",
+  "apiVersion": "equipment.hanserwei.github.io/v1alpha1",
   "kind": "Equipment",
   "metadata": {
     "name": "my-desktop"

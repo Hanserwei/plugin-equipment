@@ -31,7 +31,7 @@ const initialFormState: Equipment = {
     groupName: props.group || "",
   },
   kind: "Equipment",
-  apiVersion: "equipment.kunkunyu.com/v1alpha1",
+  apiVersion: "equipment.hanserwei.github.io/v1alpha1",
 };
 
 type AttributeRow = EquipmentAttribute & { id: number };
@@ -103,11 +103,11 @@ async function handleSaveEquipment() {
     isSubmitting.value = true;
     const { data } = isUpdateMode.value
       ? await axiosInstance.put<Equipment>(
-          `/apis/equipment.kunkunyu.com/v1alpha1/equipments/${equipment.metadata.name}`,
+          `/apis/equipment.hanserwei.github.io/v1alpha1/equipments/${equipment.metadata.name}`,
           equipment,
         )
       : await axiosInstance.post<Equipment>(
-          "/apis/equipment.kunkunyu.com/v1alpha1/equipments",
+          "/apis/equipment.hanserwei.github.io/v1alpha1/equipments",
           equipment,
         );
     emit("saved", data);
@@ -261,7 +261,7 @@ async function handleSaveEquipment() {
         ref="annotationsFormRef"
         :value="formState.metadata.annotations"
         kind="Equipment"
-        group="equipment.kunkunyu.com"
+        group="equipment.hanserwei.github.io"
       />
     </details>
     <template #footer>

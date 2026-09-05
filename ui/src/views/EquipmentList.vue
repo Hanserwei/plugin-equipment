@@ -48,13 +48,13 @@ const keyword = ref("");
 const equipments = ref<Equipment[]>([]);
 
 const { isLoading, refetch } = useQuery<Equipment[]>({
-  queryKey: ["plugin:equipment:data", page, size, keyword, selectedGroup],
+  queryKey: ["plugin:han-equipment:data", page, size, keyword, selectedGroup],
   queryFn: async () => {
     if (!selectedGroup.value) {
       return [];
     }
     const { data } = await axiosInstance.get<EquipmentList>(
-      "/apis/console.api.equipment.kunkunyu.com/v1alpha1/equipments",
+      "/apis/console.api.equipment.hanserwei.github.io/v1alpha1/equipments",
       {
         params: {
           page: page.value,
@@ -89,10 +89,10 @@ const { isLoading, refetch } = useQuery<Equipment[]>({
 const groups = ref<EquipmentGroup[]>([]);
 
 const { refetch: groupRefetch, isLoading: groupIsLoading } = useQuery<EquipmentGroup[]>({
-  queryKey: ["plugin:equipment:groups"],
+  queryKey: ["plugin:han-equipment:groups"],
   queryFn: async () => {
     const { data } = await axiosInstance.get<EquipmentGroupList>(
-      "/apis/console.api.equipment.kunkunyu.com/v1alpha1/equipmentgroups",
+      "/apis/console.api.equipment.hanserwei.github.io/v1alpha1/equipmentgroups",
     );
     return data.items
       .map((group) => {
@@ -164,7 +164,7 @@ const handleDeleteInBatch = () => {
     onConfirm: async () => {
       try {
         const promises = selectedEquipmentNames.value.map((name) => {
-          return axiosInstance.delete(`/apis/equipment.kunkunyu.com/v1alpha1/equipments/${name}`);
+          return axiosInstance.delete(`/apis/equipment.hanserwei.github.io/v1alpha1/equipments/${name}`);
         });
         await Promise.all(promises);
         checkedAll.value = false;
@@ -193,7 +193,7 @@ async function handleMoveInBatch(group: EquipmentGroup) {
       },
     ];
     return axiosInstance.patch(
-      `/apis/equipment.kunkunyu.com/v1alpha1/equipments/${equipment.metadata.name}`,
+      `/apis/equipment.hanserwei.github.io/v1alpha1/equipments/${equipment.metadata.name}`,
       JSON.stringify(patchDoc),
       {
         headers: {
@@ -333,14 +333,14 @@ const onAttachmentsSelect = async (attachments: AttachmentLike[]) => {
   }
 
   const createRequests = equipments.map((equipment) => {
-    return axiosInstance.post<Equipment>("/apis/equipment.kunkunyu.com/v1alpha1/equipments", {
+    return axiosInstance.post<Equipment>("/apis/equipment.hanserwei.github.io/v1alpha1/equipments", {
       metadata: {
         name: "",
         generateName: "equipment-",
       },
       spec: equipment,
       kind: "Equipment",
-      apiVersion: "equipment.kunkunyu.com/v1alpha1",
+      apiVersion: "equipment.hanserwei.github.io/v1alpha1",
     });
   });
 
@@ -357,7 +357,7 @@ const handleSaveInBatch = async () => {
         equipment.spec.priority = index;
       }
       return axiosInstance.put(
-        `/apis/equipment.kunkunyu.com/v1alpha1/equipments/${equipment.metadata.name}`,
+        `/apis/equipment.hanserwei.github.io/v1alpha1/equipments/${equipment.metadata.name}`,
         equipment,
       );
     });
@@ -448,7 +448,7 @@ const onEditingModalClose = () => {
                 </div>
                 <div
                   v-if="selectedGroup"
-                  v-permission="['plugin:equipment:manage']"
+                  v-permission="['plugin:han-equipment:manage']"
                   class=":uno: mt-4 flex sm:mt-0"
                 >
                   <VDropdown>
@@ -472,7 +472,7 @@ const onEditingModalClose = () => {
                 <VSpace>
                   <VButton @click="refetch"> 刷新</VButton>
                   <VButton
-                    v-permission="['plugin:equipment:manage']"
+                    v-permission="['plugin:han-equipment:manage']"
                     type="primary"
                     @click="handleOpenEditingModal()"
                   >
@@ -560,7 +560,7 @@ const onEditingModalClose = () => {
 
                   <div
                     v-if="!equipment.metadata.deletionTimestamp"
-                    v-permission="['plugin:equipment:manage']"
+                    v-permission="['plugin:han-equipment:manage']"
                     :class="{
                       ':uno: !flex': selectedEquipmentNames.includes(equipment.metadata.name),
                     }"

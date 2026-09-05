@@ -1,1 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12L6 9H4a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h2zm6 0l3-3h2a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1h-2zm-3 3l-3 3v2a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-2zm0-6L9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2z"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-labelledby="title">
+  <title id="title">han-equipment</title>
+  <rect width="128" height="128" rx="28" fill="#24314e"/>
+  <rect x="21" y="25" width="86" height="62" rx="10" fill="#344566" stroke="#a7bcff" stroke-width="4"/>
+  <path d="M48 105h32M64 87v18" fill="none" stroke="#a7bcff" stroke-width="5" stroke-linecap="round"/>
+  <path d="M48 43v27m32-27v27M48 56h32" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="96" cy="96" r="13" fill="#62cfa7" stroke="#24314e" stroke-width="4"/>
+</svg>

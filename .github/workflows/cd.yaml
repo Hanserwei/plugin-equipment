@@ -2,17 +2,41 @@ name: CD
 
 on:
   release:
-    types:
-      - published
+    types: [published]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.event.release.tag_name }}
+  cancel-in-progress: false
 
 jobs:
-  cd:
-    uses: halo-sigs/reusable-workflows/.github/workflows/plugin-cd.yaml@v3
+  validate:
+    name: Validate release tag
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Check version before building
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: python3 scripts/check-release.py
+
+  release:
+    name: Build and upload GitHub Release assets
+    needs: validate
+    uses: halo-sigs/reusable-workflows/.github/workflows/plugin-cd.yaml@99c24709710a37e286adca6879d8d5faf46224fc # v4
     permissions:
       contents: write
     with:
-      ui-path: "ui"
-      pnpm-version: 11
-      node-version: 24
-      java-version: 21
+      ui-path: ui
+      pnpm-version: "11.25.0"
+      node-version: "24"
+      java-version: "21"
+      artifacts-path: build/libs
+      # Official CD skips the aggregate check task; run its checks explicitly.
+      build-args: test verifyReleaseScripts :ui:pnpmCheck :ui:pnpmLint --console=plain
       skip-appstore-release: true

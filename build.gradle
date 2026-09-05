@@ -4,7 +4,7 @@ plugins {
     id 'java'
 }
 
-group 'com.kunkunyu.equipment'
+group 'io.github.hanserwei'
 
 repositories {
     mavenCentral()
@@ -49,3 +49,5 @@ halo {
     version = '2.26.0'
     debug = true
 }
+
+apply from: 'gradle/verification.gradle'

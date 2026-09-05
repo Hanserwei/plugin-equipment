@@ -18,7 +18,7 @@
         />
         <th:block th:if="${#strings.isEmpty(equipment.spec.cover)}">
             <th:block
-                th:replace="~{plugin:equipment:modules/icon :: icon(type=${equipment.spec.deviceType})}"
+                th:replace="~{plugin:han-equipment:modules/icon :: icon(type=${equipment.spec.deviceType})}"
             ></th:block>
         </th:block>
         <span class="equipment-card-featured-label" th:if="${equipment.spec.featured == true}">日常主力</span>

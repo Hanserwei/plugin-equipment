@@ -1,0 +1,65 @@
+import groovy.json.JsonSlurper
+import java.security.MessageDigest
+import java.util.zip.ZipFile
+
+// Validate the distributable, not just the source tree. Both CI and CD run build.
+tasks.register('verifyPluginArchive') {
+    group = 'verification'
+    description = 'Verify han-equipment metadata and bundled UI, then write a SHA-256 checksum'
+    dependsOn tasks.named('jar')
+    doLast {
+        def jarFile = tasks.named('jar').get().archiveFile.get().asFile
+        def expectedName = 'han-equipment'
+        if (jarFile.name != "${expectedName}-${project.version}.jar") {
+            throw new GradleException("Unexpected plugin archive name: ${jarFile.name}")
+        }
+        new ZipFile(jarFile).withCloseable { archive ->
+            def required = [
+                'plugin.yaml', 'logo.svg', 'console/ui-plugin.json',
+                'templates/equipments.html', 'templates/modules/equipment.html',
+                'templates/modules/card.html', 'templates/modules/icon.html',
+                'templates/modules/style.html', 'static/equipment.css',
+                'extensions/settings.yaml', 'extensions/roleTemplate.yaml',
+                'extensions/reverseProxy.yaml'
+            ]
+            required.each { path ->
+                if (archive.getEntry(path) == null) {
+                    throw new GradleException("Plugin archive is missing ${path}")
+                }
+            }
+            def manifest = archive.getInputStream(archive.getEntry('plugin.yaml')).getText('UTF-8')
+            if (!(manifest =~ /(?m)^  name: ["']?han-equipment["']?$/).find()) {
+                throw new GradleException('Packaged plugin metadata.name must be han-equipment')
+            }
+            def versionMatch = manifest =~ /(?m)^  version: ["']?([^\s"']+)["']?$/
+            if (!versionMatch.find() || versionMatch.group(1) != project.version.toString()) {
+                throw new GradleException('Packaged plugin version differs from the archive version')
+            }
+            def ui = new JsonSlurper().parse(archive.getInputStream(archive.getEntry('console/ui-plugin.json')))
+            ['entry', 'style'].each { key ->
+                def path = ui[key]
+                if (!(path instanceof String) || !path.startsWith('./') || path.contains('..')
+                    || archive.getEntry('console/' + path.substring(2)) == null) {
+                    throw new GradleException("Invalid or missing Console ${key}: ${path}")
+                }
+            }
+        }
+        def hash = MessageDigest.getInstance('SHA-256').digest(jarFile.bytes).encodeHex().toString()
+        new File(jarFile.parentFile, jarFile.name + '.sha256').setText("${hash}  ${jarFile.name}\n", 'UTF-8')
+        logger.lifecycle("Verified ${jarFile.name} and generated SHA-256 checksum")
+    }
+}
+
+tasks.register('verifyReleaseScripts', Exec) {
+    group = 'verification'
+    description = 'Test the Release tag validation without creating a GitHub Release'
+    commandLine 'python3', '-B', '-m', 'unittest', 'discover', '-s', 'scripts', '-p', 'test_*.py'
+}
+
+tasks.named('check') {
+    dependsOn tasks.named('verifyReleaseScripts')
+}
+
+tasks.named('build') {
+    dependsOn tasks.named('verifyPluginArchive')
+}

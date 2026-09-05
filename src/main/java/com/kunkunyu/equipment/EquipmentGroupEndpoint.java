@@ -57,7 +57,7 @@ public class EquipmentGroupEndpoint implements CustomEndpoint {
 
     @Override
     public GroupVersion groupVersion() {
-        return GroupVersion.parseAPIVersion("console.api.equipment.kunkunyu.com/v1alpha1");
+        return GroupVersion.parseAPIVersion("console.api.equipment.hanserwei.github.io/v1alpha1");
     }
 
     private Mono<ServerResponse> deleteEquipmentGroup(ServerRequest serverRequest) {

@@ -18,7 +18,7 @@ import com.kunkunyu.equipment.finders.EquipmentFinder;
 import com.kunkunyu.equipment.vo.EquipmentGroupVo;
 import com.kunkunyu.equipment.vo.EquipmentVo;
 
-@Finder("equipmentFinder")
+@Finder("hanEquipmentFinder")
 public class EquipmentFInderImpl implements EquipmentFinder {
     private final ReactiveExtensionClient client;
 

@@ -8,13 +8,13 @@ export default definePlugin({
     {
       parentName: "Root",
       route: {
-        path: "/equipments",
-        name: "Equipments",
+        path: "/han-equipments",
+        name: "HanEquipments",
         component: () => import("@/views/EquipmentList.vue"),
         meta: {
-          permissions: ["plugin:equipment:view"],
+          permissions: ["plugin:han-equipment:view"],
           menu: {
-            name: "装备",
+            name: "Han 装备",
             group: "content",
             icon: markRaw(TablerDeviceGamepad3),
           },

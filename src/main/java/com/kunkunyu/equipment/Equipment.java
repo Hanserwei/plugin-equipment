@@ -16,7 +16,7 @@ import run.halo.app.extension.GVK;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@GVK(group = "equipment.kunkunyu.com", version = "v1alpha1", kind = "Equipment", plural = "equipments",
+@GVK(group = "equipment.hanserwei.github.io", version = "v1alpha1", kind = "Equipment", plural = "equipments",
     singular = "equipment")
 public class Equipment extends AbstractExtension {
 

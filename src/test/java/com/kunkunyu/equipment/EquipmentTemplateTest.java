@@ -36,9 +36,9 @@ class EquipmentTemplateTest {
         resolver.setPrefix("templates/");
         resolver.setSuffix(".html");
         resolver.setTemplateAliases(Map.of(
-            "plugin:equipment:modules/equipment", "modules/equipment",
-            "plugin:equipment:modules/card", "modules/card",
-            "plugin:equipment:modules/icon", "modules/icon"
+            "plugin:han-equipment:modules/equipment", "modules/equipment",
+            "plugin:han-equipment:modules/card", "modules/card",
+            "plugin:han-equipment:modules/icon", "modules/icon"
         ));
         var engine = new SpringTemplateEngine();
         engine.setTemplateResolver(resolver);

@@ -1,5 +1,5 @@
 {
-  "name": "equipment-ui",
+  "name": "han-equipment-ui",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@11.25.0",

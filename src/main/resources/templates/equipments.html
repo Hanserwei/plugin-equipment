@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title th:text="${title + ' | ' + site.title}">我的装备</title>
         <link rel="icon" th:if="${not #strings.isEmpty(site.favicon)}" th:href="${site.favicon}" />
-        <th:block th:replace="~{plugin:equipment:modules/style}"></th:block>
+        <th:block th:replace="~{plugin:han-equipment:modules/style}"></th:block>
     </head>
     <body class="equipment-page">
         <main class="equipment-page-main">
@@ -14,7 +14,7 @@
                 <h1 th:text="${title}">我的装备</h1>
                 <div>陪伴日常的设备，以及它们背后的配置。</div>
             </header>
-            <th:block th:replace="~{plugin:equipment:modules/equipment :: list(groups=${groups})}"></th:block>
+            <th:block th:replace="~{plugin:han-equipment:modules/equipment :: list(groups=${groups})}"></th:block>
         </main>
     </body>
 </html>

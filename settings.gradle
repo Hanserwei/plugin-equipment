@@ -3,5 +3,5 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
-rootProject.name = 'plugin-equipment'
+rootProject.name = 'han-equipment'
 include 'ui'

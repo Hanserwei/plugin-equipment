@@ -2,17 +2,26 @@ name: CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  ci:
-    uses: halo-sigs/reusable-workflows/.github/workflows/plugin-ci.yaml@v3
+  check:
+    name: Build, test and verify plugin
+    uses: halo-sigs/reusable-workflows/.github/workflows/plugin-ci.yaml@99c24709710a37e286adca6879d8d5faf46224fc # v4
     with:
-      ui-path: "ui"
-      pnpm-version: 11
-      node-version: 24
-      java-version: 21
+      ui-path: ui
+      pnpm-version: "11.25.0"
+      node-version: "24"
+      java-version: "21"
+      artifacts-path: build/libs
+      build-args: --console=plain

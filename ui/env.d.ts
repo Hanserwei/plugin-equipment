@@ -3,13 +3,6 @@
 
 export { };
 
-declare module "*.vue" {
-    import type { ComponentOptions } from "vue";
-    const Component: ComponentOptions;
-    export default Component;
-}
-
-
 declare module "axios" {
   export interface AxiosRequestConfig {
     mute?: boolean;

@@ -19,7 +19,7 @@ const emit = defineEmits<{
 }>();
 
 const initialFormState: EquipmentGroup = {
-  apiVersion: "equipment.kunkunyu.com/v1alpha1",
+  apiVersion: "equipment.hanserwei.github.io/v1alpha1",
   kind: "EquipmentGroup",
   metadata: {
     name: "",
@@ -62,11 +62,11 @@ const handleCreateOrUpdateGroup = async () => {
     isSubmitting.value = true;
     if (isUpdateMode.value) {
       await axiosInstance.put(
-        `/apis/equipment.kunkunyu.com/v1alpha1/equipmentgroups/${formState.value.metadata.name}`,
+        `/apis/equipment.hanserwei.github.io/v1alpha1/equipmentgroups/${formState.value.metadata.name}`,
         formState.value
       );
     } else {
-      await axiosInstance.post("/apis/equipment.kunkunyu.com/v1alpha1/equipmentgroups", formState.value);
+      await axiosInstance.post("/apis/equipment.hanserwei.github.io/v1alpha1/equipmentgroups", formState.value);
     }
     modal.value?.close();
   } catch (e) {
@@ -129,7 +129,7 @@ onMounted(() => {
           ref="annotationsGroupFormRef"
           :value="formState.metadata.annotations"
           kind="EquipmentGroup"
-          group="equipment.kunkunyu.com"
+          group="equipment.hanserwei.github.io"
         />
       </div>
     </div>

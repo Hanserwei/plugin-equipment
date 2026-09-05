@@ -68,7 +68,7 @@ async function click(text: string) {
 }
 function equipment(name: string): Equipment {
   return {
-    apiVersion: "equipment.kunkunyu.com/v1alpha1",
+    apiVersion: "equipment.hanserwei.github.io/v1alpha1",
     kind: "Equipment",
     metadata: { name, version: 3, annotations: { note: "keep" } },
     spec: {

@@ -1,48 +1,48 @@
 apiVersion: v1alpha1
 kind: Role
 metadata:
-  name: equipment-public-apis
+  name: han-equipment-public-apis
   labels:
     halo.run/hidden: "true"
     halo.run/role-template: "true"
     rbac.authorization.halo.run/aggregate-to-anonymous: "true"
   annotations:
-    rbac.authorization.halo.run/module: "Equipment"
-    rbac.authorization.halo.run/display-name: "Equipment Public APIs"
+    rbac.authorization.halo.run/module: "Han 装备"
+    rbac.authorization.halo.run/display-name: "Han 装备公开查询"
 rules:
-  - apiGroups: [ "api.equipment.kunkunyu.com" ]
-    resources: [ "*" ]
-    verbs: [ "*" ]
+  - apiGroups: [ "api.equipment.hanserwei.github.io" ]
+    resources: [ "equipments", "equipmentgroups" ]
+    verbs: [ "get", "list" ]
 
 ---
 
 apiVersion: v1alpha1
 kind: Role
 metadata:
-  name: role-template-equipment-view
+  name: role-template-han-equipment-view
   labels:
     halo.run/role-template: "true"
   annotations:
-    rbac.authorization.halo.run/module: "装备"
-    rbac.authorization.halo.run/ui-permissions: '["plugin:equipment:view"]'
-    rbac.authorization.halo.run/display-name: "装备查看"
+    rbac.authorization.halo.run/module: "Han 装备"
+    rbac.authorization.halo.run/ui-permissions: '["plugin:han-equipment:view"]'
+    rbac.authorization.halo.run/display-name: "Han 装备查看"
 rules:
-  - apiGroups: [ "equipment.kunkunyu.com", "console.api.equipment.kunkunyu.com"]
+  - apiGroups: [ "equipment.hanserwei.github.io", "console.api.equipment.hanserwei.github.io"]
     resources: [ "equipments", "equipmentgroups" ]
     verbs: [ "get", "list" ]
 ---
 apiVersion: v1alpha1
 kind: Role
 metadata:
-  name: role-template-equipment-manage
+  name: role-template-han-equipment-manage
   labels:
     halo.run/role-template: "true"
   annotations:
-    rbac.authorization.halo.run/dependencies: '["role-template-equipment-view"]'
-    rbac.authorization.halo.run/ui-permissions: '["plugin:equipment:manage"]'
-    rbac.authorization.halo.run/module: "装备"
-    rbac.authorization.halo.run/display-name: "装备管理"
+    rbac.authorization.halo.run/dependencies: '["role-template-han-equipment-view"]'
+    rbac.authorization.halo.run/ui-permissions: '["plugin:han-equipment:manage"]'
+    rbac.authorization.halo.run/module: "Han 装备"
+    rbac.authorization.halo.run/display-name: "Han 装备管理"
 rules:
-  - apiGroups: [ "equipment.kunkunyu.com", "console.api.equipment.kunkunyu.com"]
+  - apiGroups: [ "equipment.hanserwei.github.io", "console.api.equipment.hanserwei.github.io"]
     resources: [ "equipments", "equipmentgroups" ]
     verbs: [ "create", "patch", "update", "delete", "deletecollection" ]

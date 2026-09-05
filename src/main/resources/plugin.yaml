@@ -1,7 +1,7 @@
 apiVersion: plugin.halo.run/v1alpha1
 kind: Plugin
 metadata:
-  name: equipment
+  name: han-equipment
 spec:
   enabled: false
   version: 2.0.0
@@ -13,9 +13,9 @@ spec:
   homepage: https://github.com/Hanserwei/plugin-equipment
   repo: https://github.com/Hanserwei/plugin-equipment
   issues: https://github.com/Hanserwei/plugin-equipment/issues
-  configMapName: equipment-configmap
-  settingName: equipment-settings
-  displayName: "装备管理"
+  configMapName: han-equipment-configmap
+  settingName: han-equipment-settings
+  displayName: "han-equipment"
   description: "管理电脑、手机、外设与操作系统，以结构化配置卡片展示你的装备"
   license:
     - name: "GPL-3.0"
