@@ -2,23 +2,21 @@ apiVersion: plugin.halo.run/v1alpha1
 kind: Plugin
 metadata:
   name: equipment
-  annotations:
-    "store.halo.run/app-id": "app-ytygyqml"
 spec:
   enabled: false
-  version: 1.1.1
-  requires: ">=2.22.0"
+  version: 2.0.0
+  requires: ">=2.26.0"
   author:
-    name: 困困鱼
-    website: https://github.com/chengzhongxue
+    name: Hanserwei
+    website: https://github.com/Hanserwei
   logo: logo.svg
-  homepage: https://www.halo.run/store/apps/app-ytygyqml
-  repo: https://github.com/chengzhongxue/plugin-equipment
-  issues: https://github.com/chengzhongxue/plugin-equipment/issues
+  homepage: https://github.com/Hanserwei/plugin-equipment
+  repo: https://github.com/Hanserwei/plugin-equipment
+  issues: https://github.com/Hanserwei/plugin-equipment/issues
   configMapName: equipment-configmap
   settingName: equipment-settings
   displayName: "装备管理"
-  description: "装备管理模块"
+  description: "管理电脑、手机、外设与操作系统，以结构化配置卡片展示你的装备"
   license:
     - name: "GPL-3.0"
-      url: "https://github.com/chengzhongxue/plugin-equipment/blob/main/LICENSE"
+      url: "https://github.com/Hanserwei/plugin-equipment/blob/main/LICENSE"

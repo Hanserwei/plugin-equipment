@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import LazyImage from "@/components/LazyImage.vue";
 import EquipmentEditingModal from "@/components/EquipmentEditingModal.vue";
-import type {Equipment, EquipmentGroup, EquipmentGroupList, EquipmentList} from "@/types";
+import EquipmentTypeIcon from "@/components/EquipmentTypeIcon.vue";
+import { deviceTypeLabel } from "@/utils/equipment";
+import type { Equipment, EquipmentGroup, EquipmentGroupList, EquipmentList } from "@/types";
 import { axiosInstance } from "@halo-dev/api-client";
 import {
   Dialog,
@@ -24,9 +26,9 @@ import type { AttachmentLike } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
 import Fuse from "fuse.js";
 import { computed, nextTick, ref, watch } from "vue";
-import TablerDeviceGamepad3 from '~icons/tabler/device-gamepad-3'
+import TablerDeviceGamepad3 from "~icons/tabler/device-gamepad-3";
 import GroupList from "../components/GroupList.vue";
-import {VueDraggable} from "vue-draggable-plus";
+import { VueDraggable } from "vue-draggable-plus";
 
 const removeFileExtension = (filename: string) => {
   return filename.replace(/\.[^/.]+$/, "");
@@ -45,23 +47,23 @@ const total = ref(0);
 const keyword = ref("");
 const equipments = ref<Equipment[]>([]);
 
-const {
-  isLoading,
-  refetch,
-} = useQuery<Equipment[]>({
+const { isLoading, refetch } = useQuery<Equipment[]>({
   queryKey: ["plugin:equipment:data", page, size, keyword, selectedGroup],
   queryFn: async () => {
     if (!selectedGroup.value) {
       return [];
     }
-    const { data } = await axiosInstance.get<EquipmentList>("/apis/console.api.equipment.kunkunyu.com/v1alpha1/equipments", {
-      params: {
-        page: page.value,
-        size: size.value,
-        keyword: keyword.value,
-        group: selectedGroup.value,
+    const { data } = await axiosInstance.get<EquipmentList>(
+      "/apis/console.api.equipment.kunkunyu.com/v1alpha1/equipments",
+      {
+        params: {
+          page: page.value,
+          size: size.value,
+          keyword: keyword.value,
+          group: selectedGroup.value,
+        },
       },
-    });
+    );
     total.value = data.total;
     return data.items
       .map((group) => {
@@ -89,7 +91,9 @@ const groups = ref<EquipmentGroup[]>([]);
 const { refetch: groupRefetch, isLoading: groupIsLoading } = useQuery<EquipmentGroup[]>({
   queryKey: ["plugin:equipment:groups"],
   queryFn: async () => {
-    const { data } = await axiosInstance.get<EquipmentGroupList>("/apis/console.api.equipment.kunkunyu.com/v1alpha1/equipmentgroups");
+    const { data } = await axiosInstance.get<EquipmentGroupList>(
+      "/apis/console.api.equipment.kunkunyu.com/v1alpha1/equipmentgroups",
+    );
     return data.items
       .map((group) => {
         if (group.spec) {
@@ -116,7 +120,9 @@ const handleSelectPrevious = () => {
     return;
   }
 
-  const currentIndex = equipments.value.findIndex((equipment) => equipment.metadata.name === selectedEquipment.value?.metadata.name);
+  const currentIndex = equipments.value.findIndex(
+    (equipment) => equipment.metadata.name === selectedEquipment.value?.metadata.name,
+  );
 
   if (currentIndex > 0) {
     selectedEquipment.value = equipments.value[currentIndex - 1];
@@ -137,7 +143,9 @@ const handleSelectNext = () => {
     selectedEquipment.value = equipments.value[0];
     return;
   }
-  const currentIndex = equipments.value.findIndex((equipment) => equipment.metadata.name === selectedEquipment.value?.metadata.name);
+  const currentIndex = equipments.value.findIndex(
+    (equipment) => equipment.metadata.name === selectedEquipment.value?.metadata.name,
+  );
   if (currentIndex !== equipments.value.length - 1) {
     selectedEquipment.value = equipments.value[currentIndex + 1];
   }
@@ -184,19 +192,22 @@ async function handleMoveInBatch(group: EquipmentGroup) {
         value: group.metadata.name || "",
       },
     ];
-    return axiosInstance.patch(`/apis/equipment.kunkunyu.com/v1alpha1/equipments/${equipment.metadata.name}`, JSON.stringify(patchDoc), {
-      headers: {
-        'Content-Type': 'application/json-patch+json'
-      }
-    });
+    return axiosInstance.patch(
+      `/apis/equipment.kunkunyu.com/v1alpha1/equipments/${equipment.metadata.name}`,
+      JSON.stringify(patchDoc),
+      {
+        headers: {
+          "Content-Type": "application/json-patch+json",
+        },
+      },
+    );
   });
 
   if (requests) await Promise.all(requests);
 
-
   await pageRefetch();
   checkedAll.value = false;
-  
+
   Toast.success("移动成功");
 }
 
@@ -216,9 +227,7 @@ const handleCheckAllChange = (e: Event) => {
 const isChecked = (equipment: Equipment) => {
   return (
     equipment.metadata.name === selectedEquipment.value?.metadata.name ||
-    selectedEquipmentNames.value
-      .map((name) => name)
-      .includes(equipment.metadata.name)
+    selectedEquipmentNames.value.map((name) => name).includes(equipment.metadata.name)
   );
 };
 
@@ -240,7 +249,7 @@ watch(
       keys: ["spec.displayName", "metadata.name", "spec.description", "spec.url"],
       useExtendedSearch: true,
     });
-  }
+  },
 );
 
 const searchResults = computed({
@@ -289,7 +298,9 @@ const onAttachmentsSelect = async (attachments: AttachmentLike[]) => {
         return {
           ...post,
           cover: attachment.status?.permalink,
-          displayName: attachment.spec.displayName ? removeFileExtension(attachment.spec.displayName) : undefined,
+          displayName: attachment.spec.displayName
+            ? removeFileExtension(attachment.spec.displayName)
+            : undefined,
           type: attachment.spec.mediaType,
         };
       }
@@ -345,7 +356,10 @@ const handleSaveInBatch = async () => {
       if (equipment.spec) {
         equipment.spec.priority = index;
       }
-      return axiosInstance.put(`/apis/equipment.kunkunyu.com/v1alpha1/equipments/${equipment.metadata.name}`, equipment);
+      return axiosInstance.put(
+        `/apis/equipment.kunkunyu.com/v1alpha1/equipments/${equipment.metadata.name}`,
+        equipment,
+      );
     });
     if (promises) {
       await Promise.all(promises);
@@ -371,7 +385,6 @@ const onEditingModalClose = () => {
   editingModal.value = false;
   refetch();
 };
-
 </script>
 <template>
   <EquipmentEditingModal
@@ -390,7 +403,11 @@ const onEditingModalClose = () => {
       </span>
     </template>
   </EquipmentEditingModal>
-  <AttachmentSelectorModal v-model:visible="attachmentModal" :accepts="['image/*']" @select="onAttachmentsSelect" />
+  <AttachmentSelectorModal
+    v-model:visible="attachmentModal"
+    :accepts="['image/*']"
+    @select="onAttachmentsSelect"
+  />
   <VPageHeader title="装备">
     <template #icon>
       <TablerDeviceGamepad3 />
@@ -429,7 +446,11 @@ const onEditingModalClose = () => {
                     </VDropdown>
                   </VSpace>
                 </div>
-                <div v-if="selectedGroup" v-permission="['plugin:equipment:manage']" class=":uno: mt-4 flex sm:mt-0">
+                <div
+                  v-if="selectedGroup"
+                  v-permission="['plugin:equipment:manage']"
+                  class=":uno: mt-4 flex sm:mt-0"
+                >
                   <VDropdown>
                     <VButton size="xs"> 新增 </VButton>
                     <template #popper>
@@ -450,7 +471,11 @@ const onEditingModalClose = () => {
               <template #actions>
                 <VSpace>
                   <VButton @click="refetch"> 刷新</VButton>
-                  <VButton v-permission="['plugin:equipment:manage']" type="primary" @click="handleOpenEditingModal()">
+                  <VButton
+                    v-permission="['plugin:equipment:manage']"
+                    type="primary"
+                    @click="handleOpenEditingModal()"
+                  >
                     <template #icon>
                       <IconAddCircle class=":uno: size-full" />
                     </template>
@@ -479,15 +504,18 @@ const onEditingModalClose = () => {
                   ':uno: ring-primary ring-1': isChecked(equipment),
                   ':uno: ring-1 ring-red-600': equipment.metadata.deletionTimestamp,
                 }"
-                class=":uno: hover:shadow drag-element "
+                class=":uno: hover:shadow drag-element"
                 @click="handleOpenEditingModal(equipment)"
               >
                 <div class=":uno: group relative bg-white">
-                  <div class=":uno: block aspect-16/9 size-full cursor-pointer overflow-hidden bg-gray-100 relative">
+                  <div
+                    class=":uno: block aspect-16/9 size-full cursor-pointer overflow-hidden bg-gray-100 relative"
+                  >
                     <LazyImage
+                      v-if="equipment.spec.cover"
                       :key="equipment.metadata.name"
                       :alt="equipment.spec.displayName"
-                      :src="equipment.spec.cover || equipment.spec.url"
+                      :src="equipment.spec.cover"
                       classes="size-full pointer-events-none group-hover:opacity-75"
                     >
                       <template #loading>
@@ -501,6 +529,15 @@ const onEditingModalClose = () => {
                         </div>
                       </template>
                     </LazyImage>
+                    <div
+                      v-else
+                      class=":uno: h-full flex flex-col items-center justify-center gap-2 text-gray-500"
+                    >
+                      <EquipmentTypeIcon :type="equipment.spec.deviceType" class=":uno: size-10" />
+                      <span class=":uno: text-xs">{{
+                        deviceTypeLabel(equipment.spec.deviceType)
+                      }}</span>
+                    </div>
                   </div>
 
                   <p
@@ -509,21 +546,39 @@ const onEditingModalClose = () => {
                   >
                     {{ equipment.spec.displayName }}
                   </p>
+                  <p class=":uno: m-0 px-2 pb-2 text-center text-xs text-gray-500">
+                    {{ equipment.spec.featured ? "重点展示 · " : ""
+                    }}{{ equipment.spec.attributes?.length || 0 }} 项配置
+                  </p>
 
-                  <div v-if="equipment.metadata.deletionTimestamp" class=":uno: absolute top-1 right-1 text-xs text-red-300">
+                  <div
+                    v-if="equipment.metadata.deletionTimestamp"
+                    class=":uno: absolute top-1 right-1 text-xs text-red-300"
+                  >
                     删除中...
                   </div>
 
                   <div
                     v-if="!equipment.metadata.deletionTimestamp"
                     v-permission="['plugin:equipment:manage']"
-                    :class="{ ':uno: !flex': selectedEquipmentNames.includes(equipment.metadata.name) }"
+                    :class="{
+                      ':uno: !flex': selectedEquipmentNames.includes(equipment.metadata.name),
+                    }"
                     class=":uno: absolute left-0 top-0 hidden h-1/3 w-full cursor-pointer justify-end from-gray-300 to-transparent bg-gradient-to-b ease-in-out group-hover:flex"
-                    @click.stop="selectedEquipmentNames.includes(equipment.metadata.name) ? selectedEquipmentNames.splice(selectedEquipmentNames.indexOf(equipment.metadata.name), 1) : selectedEquipmentNames.push(equipment.metadata.name)"
+                    @click.stop="
+                      selectedEquipmentNames.includes(equipment.metadata.name)
+                        ? selectedEquipmentNames.splice(
+                            selectedEquipmentNames.indexOf(equipment.metadata.name),
+                            1,
+                          )
+                        : selectedEquipmentNames.push(equipment.metadata.name)
+                    "
                   >
                     <IconCheckboxFill
                       :class="{
-                        ':uno: !text-primary': selectedEquipmentNames.includes(equipment.metadata.name),
+                        ':uno: !text-primary': selectedEquipmentNames.includes(
+                          equipment.metadata.name,
+                        ),
                       }"
                       class=":uno: hover:text-primary mr-1 mt-1 h-6 w-6 cursor-pointer text-white transition-all"
                     />
@@ -534,7 +589,12 @@ const onEditingModalClose = () => {
           </Transition>
 
           <template #footer>
-            <VPagination v-model:page="page" v-model:size="size" :total="total" :size-options="[20, 30, 50, 100]" />
+            <VPagination
+              v-model:page="page"
+              v-model:size="size"
+              :total="total"
+              :size-options="[20, 30, 50, 100]"
+            />
           </template>
         </VCard>
       </div>

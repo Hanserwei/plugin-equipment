@@ -5,6 +5,14 @@ plugins {
 
 group 'com.kunkunyu.equipment.ui'
 
+node {
+    pnpmVersion = '11.25.0'
+}
+
+tasks.named('pnpmInstall') {
+    args = ['--frozen-lockfile']
+}
+
 tasks.register('pnpmBuild', PnpmTask) {
     group = 'build'
     description = 'Build the UI project using pnpm'

@@ -1,0 +1,25 @@
+{
+  "apiVersion": "equipment.kunkunyu.com/v1alpha1",
+  "kind": "Equipment",
+  "metadata": {
+    "name": "my-desktop"
+  },
+  "spec": {
+    "displayName": "我的主力电脑",
+    "deviceType": "desktop",
+    "status": "in-use",
+    "featured": true,
+    "groupName": "daily-devices",
+    "specification": "Intel + NVIDIA · Arch Linux",
+    "attributes": [
+      { "label": "处理器", "value": "Intel Core i9-14900K\n24 核心 / 32 线程 · 最高 6.0 GHz" },
+      { "label": "显卡", "value": "NVIDIA GeForce RTX 3060\n12 GB 显存" },
+      { "label": "内存", "value": "系统识别 46.79 GiB" },
+      { "label": "主板", "value": "Colorful iGame Z790D5 FLOW V20" },
+      { "label": "硬盘", "value": "KIOXIA EXCERIA G2 · 1 TB NVMe\nTOPMORE Gemini · 2 TB NVMe" },
+      { "label": "显示器", "value": "Mi Monitor\n3840 × 2160 · 约 160 Hz" },
+      { "label": "操作系统", "value": "Arch Linux · Rolling Release" },
+      { "label": "窗口管理器", "value": "niri 26.04 · Wayland" }
+    ]
+  }
+}

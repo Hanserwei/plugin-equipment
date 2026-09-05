@@ -1,0 +1,60 @@
+<article
+    xmlns:th="http://www.thymeleaf.org"
+    th:fragment="card(equipment)"
+    class="equipment-card"
+    th:classappend="${equipment.spec.featured == true ? 'equipment-card--featured' : ''}"
+>
+    <div
+        class="equipment-card-visual"
+        th:classappend="${#strings.isEmpty(equipment.spec.cover) ? 'equipment-card-visual--icon' : ''}"
+    >
+        <img
+            th:if="${not #strings.isEmpty(equipment.spec.cover)}"
+            class="equipment-card-image"
+            th:src="${equipment.spec.cover}"
+            th:alt="${equipment.spec.displayName}"
+            loading="lazy"
+            decoding="async"
+        />
+        <th:block th:if="${#strings.isEmpty(equipment.spec.cover)}">
+            <th:block
+                th:replace="~{plugin:equipment:modules/icon :: icon(type=${equipment.spec.deviceType})}"
+            ></th:block>
+        </th:block>
+        <span class="equipment-card-featured-label" th:if="${equipment.spec.featured == true}">日常主力</span>
+    </div>
+    <div class="equipment-card-body">
+        <div class="equipment-card-meta">
+            <span class="equipment-card-type" th:text="${equipment.deviceTypeLabel}">台式电脑</span>
+            <span
+                class="equipment-card-status"
+                th:if="${not #strings.isEmpty(equipment.statusLabel)}"
+                th:attr="data-status=${equipment.spec.status}"
+                th:text="${equipment.statusLabel}"
+                >使用中</span
+            >
+        </div>
+        <h3 class="equipment-card-name" th:text="${equipment.spec.displayName}">我的主力电脑</h3>
+        <p
+            class="equipment-card-summary"
+            th:if="${not #strings.isEmpty(equipment.spec.specification)}"
+            th:text="${equipment.spec.specification}"
+        ></p>
+        <p
+            class="equipment-card-description"
+            th:if="${not #strings.isEmpty(equipment.spec.description)}"
+            th:text="${equipment.spec.description}"
+        ></p>
+        <dl class="equipment-card-specs" th:if="${not #lists.isEmpty(equipment.spec.attributes)}">
+            <div class="equipment-card-spec" th:each="attribute : ${equipment.spec.attributes}">
+                <dt th:text="${attribute.label}">处理器</dt>
+                <dd th:text="${attribute.value}">Intel Core i9-14900K</dd>
+            </div>
+        </dl>
+        <div class="equipment-card-footer" th:if="${equipment.link != null}">
+            <a class="equipment-card-link" th:href="${equipment.link}" target="_blank" rel="noopener noreferrer">
+                了解更多 <span aria-hidden="true">↗</span>
+            </a>
+        </div>
+    </div>
+</article>

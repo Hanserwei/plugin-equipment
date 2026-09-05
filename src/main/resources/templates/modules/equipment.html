@@ -1,32 +1,26 @@
-<div id="equipment">
-    <th:block th:each="group : ${equipmentFinder.groupBy()}">
-        <div class="equipment-item">
-            <h2 class="equipment-item-title" th:text="${group.spec.displayName}"></h2>
-            <div class="equipment-item-description" th:if="${not #strings.isEmpty(group.spec.description)}" th:text="${group.spec.description}"></div>
-            <div class="equipment-item-content">
-                <div th:each="equipment : ${group.equipments}" class="equipment-item-content-item">
-                    <div class="equipment-item-content-item-cover">
-                        <img class="equipment-item-content-item-image entered" th:alt="${equipment.spec.displayName}"
-                            th:src="${equipment.spec.cover}">
-                    </div>
-                    <div class="equipment-item-content-item-info">
-                        <div class="equipment-item-content-item-name" th:text="${equipment.spec.displayName}">
-                        </div>
-                        <div class="equipment-item-content-item-specification"
-                             th:if="${not #strings.isEmpty(equipment.spec.specification)}"
-                            th:text="${equipment.spec.specification}"></div>
-                        <div class="equipment-item-content-item-description"
-                             th:if="${not #strings.isEmpty(equipment.spec.description)}"
-                             th:text="${equipment.spec.description}">
-                        </div>
-                        <div class="equipment-item-content-item-toolbar" th:if="${not #strings.isEmpty(equipment.spec.url)}">
-                            <a class="equipment-item-content-item-link" th:href="${equipment.spec.url}"
-                                target="_blank">详情</a>
-                        </div>
-                    </div>
-
-                </div>
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="list(groups)" class="equipment-showcase">
+    <section class="equipment-group" th:each="group : ${groups}" th:if="${not #lists.isEmpty(group.equipments)}">
+        <div class="equipment-group-heading">
+            <div>
+                <h2 class="equipment-group-title" th:text="${group.spec.displayName}">我的装备</h2>
+                <p
+                    class="equipment-group-description"
+                    th:if="${not #strings.isEmpty(group.spec.description)}"
+                    th:text="${group.spec.description}"
+                ></p>
             </div>
+            <span class="equipment-group-count" th:text="${#lists.size(group.equipments) + ' 件装备'}">1 件装备</span>
         </div>
-    </th:block>
+        <div class="equipment-grid">
+            <th:block th:each="equipment : ${group.equipments}">
+                <th:block th:replace="~{plugin:equipment:modules/card :: card(equipment=${equipment})}"></th:block>
+            </th:block>
+        </div>
+    </section>
+    <p
+        class="equipment-empty"
+        th:if="${#lists.isEmpty(groups) or #lists.isEmpty(groups.?[not #lists.isEmpty(equipments)])}"
+    >
+        装备清单正在准备中，敬请期待。
+    </p>
 </div>

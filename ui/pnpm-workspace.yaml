@@ -1,0 +1,3 @@
+# Vue Query 4 uses Vue Demi to generate its local Vue 3 compatibility exports.
+allowBuilds:
+  vue-demi: true
