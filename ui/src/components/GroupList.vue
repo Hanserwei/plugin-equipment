@@ -34,7 +34,9 @@ const groups = ref<EquipmentGroup[]>([]);
 const { refetch, isLoading } = useQuery<EquipmentGroup[]>({
   queryKey: ["plugin:han-equipment:groups"],
   queryFn: async () => {
-    const { data } = await axiosInstance.get<EquipmentGroupList>("/apis/console.api.equipment.hanserwei.github.io/v1alpha1/equipmentgroups");
+    const { data } = await axiosInstance.get<EquipmentGroupList>(
+      "/apis/console.api.equipment.hanserwei.github.io/v1alpha1/equipmentgroups",
+    );
     return data.items
       .map((group) => {
         if (group.spec) {
@@ -77,7 +79,10 @@ const handleSaveInBatch = async () => {
       if (group.spec) {
         group.spec.priority = index;
       }
-      return axiosInstance.put(`/apis/equipment.hanserwei.github.io/v1alpha1/equipmentgroups/${group.metadata.name}`, group);
+      return axiosInstance.put(
+        `/apis/equipment.hanserwei.github.io/v1alpha1/equipmentgroups/${group.metadata.name}`,
+        group,
+      );
     });
     if (promises) {
       await Promise.all(promises);
@@ -96,7 +101,9 @@ const handleDelete = async (group: EquipmentGroup) => {
     confirmType: "danger",
     onConfirm: async () => {
       try {
-        await axiosInstance.delete(`/apis/console.api.equipment.hanserwei.github.io/v1alpha1/equipmentgroups/${group.metadata.name}`);
+        await axiosInstance.delete(
+          `/apis/console.api.equipment.hanserwei.github.io/v1alpha1/equipmentgroups/${group.metadata.name}`,
+        );
         refetch();
       } catch (e) {
         console.error("Failed to delete equipment group", e);
@@ -125,7 +132,11 @@ function onGroupEditingModalClose() {
 }
 </script>
 <template>
-  <GroupEditingModal v-if="groupEditingModal" :group="updateGroup" @close="onGroupEditingModalClose" />
+  <GroupEditingModal
+    v-if="groupEditingModal"
+    :group="updateGroup"
+    @close="onGroupEditingModalClose"
+  />
   <VCard :body-class="[':uno: !p-0']" title="分组">
     <VLoading v-if="isLoading" />
     <Transition v-else-if="!groups || !groups.length" appear name="fade">

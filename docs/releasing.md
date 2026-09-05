@@ -49,6 +49,16 @@ GitHub Release tag                 v2.0.0 或 2.0.0
 
 `Source code (zip/tar.gz)` 是 GitHub 自动提供的源码归档，不是可安装插件。用户应下载 JAR。
 
+2.0.0 是独立维护的首个版本，发布说明保存在 [`releases/2.0.0.md`](releases/2.0.0.md)。在标签已推送、Release 尚未创建时，也可以从仓库根目录用 GitHub CLI 发布：
+
+```bash
+gh release create 2.0.0 --verify-tag \
+  --title "han-equipment 2.0.0 · 独立维护首个版本" \
+  --notes-file docs/releases/2.0.0.md
+```
+
+创建 Release 时不要手动附加本地 JAR，等待 CD 上传经过检查的构建产物。
+
 ## CI 做什么
 
 `.github/workflows/ci.yaml` 在以下情况运行：
@@ -68,15 +78,36 @@ CI 使用固定到提交的 Halo reusable workflows v4，环境为 JDK 21、Node
 
 ## CD 做什么
 
-`.github/workflows/cd.yaml` 仅响应 **GitHub Release published**：推送普通提交或只推送标签不会发布附件。
+`.github/workflows/cd.yaml` 支持 **GitHub Release published** 和 **workflow_dispatch**。推送普通提交或只推送标签不会发布附件。
 
-1. 校验标签为合法 SemVer，并与提交中的两个版本声明一致；这个步骤在标签参与官方构建命令之前执行。
-2. 根据 Release 的源码执行干净构建，版本作为 `-Pversion` 传入 Gradle。
-3. 官方 CD 默认排除聚合 `check` 任务，本项目通过 `build-args` 显式运行 Java 测试、UI 测试、lint 和 Release 脚本测试，避免发布流程跳过这些检查。
-4. `build` 依赖 `verifyPluginArchive`：验证 JAR 文件名、内部插件标识与版本、模板、样式、Logo、扩展资源，以及 Console manifest 对应的实际入口文件。
-5. 验证成功后生成校验和，并将 JAR 和 `.sha256` 上传到触发流水线的 Release。
+1. 根据 Release 的标签或手动输入的 `tag` 检出 `refs/tags/<tag>`，校验合法 SemVer，并确认与该提交中的两个版本声明一致。
+2. 使用 Halo 官方构建环境（JDK 21、Node 24、pnpm 11.25.0），执行 `./gradlew clean build --no-daemon --console=plain`，包含 CI 中的全部检查和测试。
+3. `build` 依赖 `verifyPluginArchive`：验证 JAR 文件名、内部插件标识与版本、模板、样式、Logo、扩展资源，以及 Console manifest 对应的实际入口文件。
+4. 验证 SHA-256，将 JAR 和校验和保存为 `han-equipment-<version>-<commit>` 构建产物，保留 14 天。
+5. 自动发布，或手动勾选 `publish` 时，独立的上传任务下载本次构建产物，再次检查 SHA-256、标签指向和 Release 已发布状态，最后上传 JAR 与校验和。
 
-只有上传附件的发布工作拥有 `contents: write` 权限，CI 与标签检查为只读。工作流未声明 `HALO_PAT` 或 App Store App ID。官方工作流内部使用的 actions 由其固定提交对应的版本管理。
+构建任务只有读取仓库的权限，只有上传任务拥有 `contents: write`。同一标签的 CD 串行执行，不取消已经开始的发布；标签在构建后被改动时，上传会失败。上传不使用 `--clobber`，同名附件已经存在时会报错。
+
+CI 继续使用 Halo 官方 reusable workflow；CD 复用其固定到提交的 `plugin-setup-env`，以支持手动入口并直接执行完整构建。工作流未声明 `HALO_PAT` 或 App Store App ID。
+
+## 手动构建和补传
+
+在 **Actions → CD → Run workflow** 中保留工作流分支为 `main`，填写已经存在的版本标签。业务源码始终取自这个标签。
+
+- 默认 `publish: false`：只做完整构建，在 Actions 中提供 JAR 和校验和，不需要对应的 Release 已创建。
+- 勾选 `publish`：完整构建通过后，将附件补传到该标签对应的已发布 Release。不会创建 Release，也不会覆盖已有同名附件。
+
+CLI 示例：
+
+```bash
+# 验证指定版本，只生成 Actions 构建产物
+gh workflow run cd.yaml --ref main -f tag=2.0.0 -F publish=false
+
+# 对已有 Release 补传构建产物
+gh workflow run cd.yaml --ref main -f tag=2.0.0 -F publish=true
+```
+
+如果 Release 已发布但没有 CD 运行记录，可通过手动入口补传，无需重复删除、创建 Release。
 
 ## 失败与重试
 
@@ -84,7 +115,8 @@ CI 使用固定到提交的 Halo reusable workflows v4，环境为 JDK 21、Node
 - **pnpm 锁文件不一致**：在 `ui/` 中用指定的 pnpm 版本重新安装并提交 `pnpm-lock.yaml`，不要在 CI 里取消 frozen lockfile。
 - **JAR 缺少文件或内部版本错误**：查看 `verifyPluginArchive` 输出，修复打包配置后重新运行本地干净构建。
 - **GitHub Actions 未启用**：fork 默认状态可能与原仓库不同，在 Actions 页面确认工作流已启用。
-- **上传失败**：检查 GitHub Release 和 Actions 日志。官方上传不使用 `--clobber`，不会静默覆盖同名附件。已正式发布的版本有问题时，应修复后发布新版本。
+- **Release 没有触发 CD**：确认标签提交包含工作流且 Actions 已启用；GitHub Actions 使用默认 `GITHUB_TOKEN` 创建 Release 时，不会再触发其他工作流。可从上述手动入口运行，并查看是否有审批或执行限制。
+- **上传失败**：检查 GitHub Release 和 Actions 日志，确认 Release 已发布、标签未移动、同名附件不存在。下载已有附件后可先校验；已正式分发的版本有问题时，应修复后发布新版本。
 
 下载校验：
 

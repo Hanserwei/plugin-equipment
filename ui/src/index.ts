@@ -1,6 +1,6 @@
 import { definePlugin } from "@halo-dev/ui-shared";
 import { markRaw } from "vue";
-import TablerDeviceGamepad3 from '~icons/tabler/device-gamepad-3'
+import TablerDeviceGamepad3 from "~icons/tabler/device-gamepad-3";
 import "uno.css";
 
 export default definePlugin({

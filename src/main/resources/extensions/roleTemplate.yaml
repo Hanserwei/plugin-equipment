@@ -10,12 +10,11 @@ metadata:
     rbac.authorization.halo.run/module: "Han 装备"
     rbac.authorization.halo.run/display-name: "Han 装备公开查询"
 rules:
-  - apiGroups: [ "api.equipment.hanserwei.github.io" ]
-    resources: [ "equipments", "equipmentgroups" ]
-    verbs: [ "get", "list" ]
+  - apiGroups: ["api.equipment.hanserwei.github.io"]
+    resources: ["equipments", "equipmentgroups"]
+    verbs: ["get", "list"]
 
 ---
-
 apiVersion: v1alpha1
 kind: Role
 metadata:
@@ -27,9 +26,9 @@ metadata:
     rbac.authorization.halo.run/ui-permissions: '["plugin:han-equipment:view"]'
     rbac.authorization.halo.run/display-name: "Han 装备查看"
 rules:
-  - apiGroups: [ "equipment.hanserwei.github.io", "console.api.equipment.hanserwei.github.io"]
-    resources: [ "equipments", "equipmentgroups" ]
-    verbs: [ "get", "list" ]
+  - apiGroups: ["equipment.hanserwei.github.io", "console.api.equipment.hanserwei.github.io"]
+    resources: ["equipments", "equipmentgroups"]
+    verbs: ["get", "list"]
 ---
 apiVersion: v1alpha1
 kind: Role
@@ -43,6 +42,6 @@ metadata:
     rbac.authorization.halo.run/module: "Han 装备"
     rbac.authorization.halo.run/display-name: "Han 装备管理"
 rules:
-  - apiGroups: [ "equipment.hanserwei.github.io", "console.api.equipment.hanserwei.github.io"]
-    resources: [ "equipments", "equipmentgroups" ]
-    verbs: [ "create", "patch", "update", "delete", "deletecollection" ]
+  - apiGroups: ["equipment.hanserwei.github.io", "console.api.equipment.hanserwei.github.io"]
+    resources: ["equipments", "equipmentgroups"]
+    verbs: ["create", "patch", "update", "delete", "deletecollection"]

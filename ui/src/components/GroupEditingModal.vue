@@ -3,7 +3,7 @@ import type { EquipmentGroup } from "@/types";
 import { axiosInstance } from "@halo-dev/api-client";
 import { VButton, VModal, VSpace } from "@halo-dev/components";
 import { cloneDeep } from "lodash-es";
-import {computed, nextTick, onMounted, ref, useTemplateRef, watch} from "vue";
+import { computed, nextTick, onMounted, ref, useTemplateRef, watch } from "vue";
 
 const props = withDefaults(
   defineProps<{
@@ -11,7 +11,7 @@ const props = withDefaults(
   }>(),
   {
     group: undefined,
-  }
+  },
 );
 
 const emit = defineEmits<{
@@ -50,7 +50,8 @@ const annotationsGroupFormRef = ref();
 const handleCreateOrUpdateGroup = async () => {
   annotationsGroupFormRef.value?.handleSubmit();
   await nextTick();
-  const { customAnnotations, annotations, customFormInvalid, specFormInvalid } = annotationsGroupFormRef.value || {};
+  const { customAnnotations, annotations, customFormInvalid, specFormInvalid } =
+    annotationsGroupFormRef.value || {};
   if (customFormInvalid || specFormInvalid) {
     return;
   }
@@ -63,10 +64,13 @@ const handleCreateOrUpdateGroup = async () => {
     if (isUpdateMode.value) {
       await axiosInstance.put(
         `/apis/equipment.hanserwei.github.io/v1alpha1/equipmentgroups/${formState.value.metadata.name}`,
-        formState.value
+        formState.value,
       );
     } else {
-      await axiosInstance.post("/apis/equipment.hanserwei.github.io/v1alpha1/equipmentgroups", formState.value);
+      await axiosInstance.post(
+        "/apis/equipment.hanserwei.github.io/v1alpha1/equipmentgroups",
+        formState.value,
+      );
     }
     modal.value?.close();
   } catch (e) {
@@ -105,12 +109,7 @@ onMounted(() => {
             validation="required"
             help="可根据此名称查询装备"
           ></FormKit>
-          <FormKit
-            name="description"
-            label="分组描述"
-            type="textarea"
-          ></FormKit>
-          
+          <FormKit name="description" label="分组描述" type="textarea"></FormKit>
         </div>
       </div>
     </FormKit>
@@ -135,7 +134,11 @@ onMounted(() => {
     </div>
     <template #footer>
       <VSpace>
-        <VButton :loading="isSubmitting" type="secondary" @click="$formkit.submit('equipment-group-form')">
+        <VButton
+          :loading="isSubmitting"
+          type="secondary"
+          @click="$formkit.submit('equipment-group-form')"
+        >
           提交
         </VButton>
         <VButton @click="emit('close')">取消</VButton>

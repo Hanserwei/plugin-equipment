@@ -5,6 +5,7 @@
 # han-equipment
 
 [![CI](https://github.com/Hanserwei/plugin-equipment/actions/workflows/ci.yaml/badge.svg)](https://github.com/Hanserwei/plugin-equipment/actions/workflows/ci.yaml)
+[![CD](https://github.com/Hanserwei/plugin-equipment/actions/workflows/cd.yaml/badge.svg)](https://github.com/Hanserwei/plugin-equipment/actions/workflows/cd.yaml)
 [![Halo](https://img.shields.io/badge/Halo-%E2%89%A5%202.26.0-blue)](https://www.halo.run/)
 [![License](https://img.shields.io/badge/license-GPL--3.0-green)](LICENSE)
 
@@ -13,6 +14,8 @@
 由 [Hanserwei](https://github.com/Hanserwei) 独立维护，基于困困鱼的 [plugin-equipment](https://github.com/chengzhongxue/plugin-equipment)。插件标识为 **`han-equipment`**，使用独立的数据和权限命名空间。
 
 [下载版本](https://github.com/Hanserwei/plugin-equipment/releases) · [主题适配](docs/theme-integration.md) · [反馈问题](https://github.com/Hanserwei/plugin-equipment/issues) · [发布流程](docs/releasing.md)
+
+**2.0.0 是 han-equipment 由 Hanserwei 独立维护后发布的首个版本。** 本版提供装备分类、结构化参数、使用状态、重点展示和主题卡片集成，完整说明见 [2.0.0 发布说明](docs/releases/2.0.0.md)。
 
 ## 能做什么
 
@@ -152,16 +155,18 @@ corepack pnpm dev                # 监听 Console UI 变更并构建
 
 ## CI/CD 与发布
 
-工作流基于 Halo 官方 reusable workflows v4，并固定到已核对的提交。
+CI 使用 Halo 官方 reusable workflow v4；CD 复用其构建环境，独立支持自动发布和手动构建。引用的工作流与 action 固定到已核对的提交。
 
 | 工作流 | 触发条件 | 执行内容 |
 | --- | --- | --- |
 | CI | 推送到 `main`、面向 `main` 的 PR、手动运行 | `clean build`，包括前后端检查及 JAR 校验；PR 构建附带临时产物 |
-| CD | 发布 GitHub Release | 校验版本标签，干净构建，显式执行测试与 lint，再上传 JAR 和 SHA-256 到该 Release |
+| CD | 发布 GitHub Release，或在 Actions 中手动指定版本标签 | 校验标签，执行完整 `clean build`，验证 JAR 和校验和，保存 14 天构建产物；自动发布或手动勾选上传时，将附件上传到已有 Release |
 
 Release 标签可使用 `v2.0.0` 或 `2.0.0`，也支持 `v2.1.0-rc.1`。标签版本必须与该提交中的 `gradle.properties`、`plugin.yaml` 一致。CD 的构建、测试或校验失败时不会上传 Release 产物；同一版本发布后不要替换制品。
 
-目前只配置 **GitHub Release 附件发布**：`skip-appstore-release: true`，不配置应用商店 App ID、`HALO_PAT` 或自动同步。首次上架、商店资料和发布后的同步配置按需另行处理。
+手动运行 CD 默认只构建，在 **Actions → CD → Run workflow** 中填写 `tag`；需要向已发布的 GitHub Release 补传附件时，再勾选 `publish`。构建始终使用该标签的源码，不会使用手动运行时所选分支的业务代码。上传前会再次核对标签指向，且不会覆盖已有同名附件。
+
+目前只配置 **GitHub Release 附件发布**，工作流未接入应用市场，不需要 App ID 或 `HALO_PAT`。首次上架和审核后的自动同步配置按需另行处理。
 
 维护者操作步骤见 [发布指南](docs/releasing.md)，Halo 官方要求见 [发布应用](https://docs.halo.run/developer-guide/app-store/publish-app.md)。
 

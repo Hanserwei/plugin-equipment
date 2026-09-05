@@ -164,7 +164,9 @@ const handleDeleteInBatch = () => {
     onConfirm: async () => {
       try {
         const promises = selectedEquipmentNames.value.map((name) => {
-          return axiosInstance.delete(`/apis/equipment.hanserwei.github.io/v1alpha1/equipments/${name}`);
+          return axiosInstance.delete(
+            `/apis/equipment.hanserwei.github.io/v1alpha1/equipments/${name}`,
+          );
         });
         await Promise.all(promises);
         checkedAll.value = false;
@@ -333,15 +335,18 @@ const onAttachmentsSelect = async (attachments: AttachmentLike[]) => {
   }
 
   const createRequests = equipments.map((equipment) => {
-    return axiosInstance.post<Equipment>("/apis/equipment.hanserwei.github.io/v1alpha1/equipments", {
-      metadata: {
-        name: "",
-        generateName: "equipment-",
+    return axiosInstance.post<Equipment>(
+      "/apis/equipment.hanserwei.github.io/v1alpha1/equipments",
+      {
+        metadata: {
+          name: "",
+          generateName: "equipment-",
+        },
+        spec: equipment,
+        kind: "Equipment",
+        apiVersion: "equipment.hanserwei.github.io/v1alpha1",
       },
-      spec: equipment,
-      kind: "Equipment",
-      apiVersion: "equipment.hanserwei.github.io/v1alpha1",
-    });
+    );
   });
 
   await Promise.all(createRequests);

@@ -1,42 +1,113 @@
 name: CD
+run-name: CD · ${{ inputs.tag || github.event.release.tag_name }}
 
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing version tag to build, for example 2.0.0 or v2.1.0-rc.1
+        required: true
+        type: string
+      publish:
+        description: Upload to the existing published GitHub Release
+        required: true
+        default: false
+        type: boolean
 
+# GitHub builds and Release assets only; App Store publishing is not configured.
 permissions:
   contents: read
 
 concurrency:
-  group: release-${{ github.event.release.tag_name }}
+  group: release-${{ inputs.tag || github.event.release.tag_name }}
   cancel-in-progress: false
 
-jobs:
-  validate:
-    name: Validate release tag
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
-        with:
-          persist-credentials: false
-      - name: Check version before building
-        env:
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
-        run: python3 scripts/check-release.py
+env:
+  RELEASE_TAG: ${{ inputs.tag || github.event.release.tag_name }}
 
-  release:
-    name: Build and upload GitHub Release assets
-    needs: validate
-    uses: halo-sigs/reusable-workflows/.github/workflows/plugin-cd.yaml@99c24709710a37e286adca6879d8d5faf46224fc # v4
+jobs:
+  build:
+    name: Validate, test and package plugin
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      commit: ${{ steps.version.outputs.commit }}
+    steps:
+      - name: Check out release tag
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: refs/tags/${{ env.RELEASE_TAG }}
+          persist-credentials: false
+      - name: Validate release version
+        id: version
+        run: |
+          python3 -B scripts/check-release.py
+          printf 'version=%s\n' "${RELEASE_TAG#v}" >> "$GITHUB_OUTPUT"
+          printf 'commit=%s\n' "$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Set up build environment
+        uses: halo-sigs/reusable-workflows/plugin-setup-env@99c24709710a37e286adca6879d8d5faf46224fc # v4
+        with:
+          cache-dept-path: ui/pnpm-lock.yaml
+          pnpm-version: "11.25.0"
+          node-version: "24"
+          java-version: "21"
+      - name: Build, test and verify plugin
+        run: ./gradlew clean build --no-daemon --console=plain
+      - name: Verify package checksum
+        working-directory: build/libs
+        env:
+          PLUGIN_VERSION: ${{ steps.version.outputs.version }}
+        run: sha256sum --check "han-equipment-${PLUGIN_VERSION}.jar.sha256"
+      - name: Upload verified package
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: han-equipment-${{ steps.version.outputs.version }}-${{ steps.version.outputs.commit }}
+          path: |
+            build/libs/han-equipment-${{ steps.version.outputs.version }}.jar
+            build/libs/han-equipment-${{ steps.version.outputs.version }}.jar.sha256
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
+
+  publish:
+    name: Upload GitHub Release assets
+    if: github.event_name == 'release' || inputs.publish
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: write
-    with:
-      ui-path: ui
-      pnpm-version: "11.25.0"
-      node-version: "24"
-      java-version: "21"
-      artifacts-path: build/libs
-      # Official CD skips the aggregate check task; run its checks explicitly.
-      build-args: test verifyReleaseScripts :ui:pnpmCheck :ui:pnpmLint --console=plain
-      skip-appstore-release: true
+    env:
+      PLUGIN_VERSION: ${{ needs.build.outputs.version }}
+      PLUGIN_COMMIT: ${{ needs.build.outputs.commit }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Download verified package
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: han-equipment-${{ needs.build.outputs.version }}-${{ needs.build.outputs.commit }}
+          path: dist
+      - name: Verify package checksum
+        working-directory: dist
+        run: sha256sum --check "han-equipment-${PLUGIN_VERSION}.jar.sha256"
+      - name: Verify release still points to the built commit
+        run: |
+          release_commit=$(gh api "repos/${GITHUB_REPOSITORY}/commits/${RELEASE_TAG}" --jq '.sha')
+          if [[ "$release_commit" != "$PLUGIN_COMMIT" ]]; then
+            echo "::error::The release tag changed after this package was built."
+            exit 1
+          fi
+          is_draft=$(gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json isDraft --jq '.isDraft')
+          if [[ "$is_draft" != "false" ]]; then
+            echo "::error::Publish the GitHub Release before uploading its assets."
+            exit 1
+          fi
+      - name: Upload JAR and checksum
+        run: |
+          gh release upload "$RELEASE_TAG" \
+            "dist/han-equipment-${PLUGIN_VERSION}.jar" \
+            "dist/han-equipment-${PLUGIN_VERSION}.jar.sha256" \
+            --repo "$GITHUB_REPOSITORY"
