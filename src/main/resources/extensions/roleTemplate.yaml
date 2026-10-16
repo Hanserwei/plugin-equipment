@@ -1,0 +1,47 @@
+apiVersion: v1alpha1
+kind: Role
+metadata:
+  name: han-equipment-public-apis
+  labels:
+    halo.run/hidden: "true"
+    halo.run/role-template: "true"
+    rbac.authorization.halo.run/aggregate-to-anonymous: "true"
+  annotations:
+    rbac.authorization.halo.run/module: "Han 装备"
+    rbac.authorization.halo.run/display-name: "Han 装备公开查询"
+rules:
+  - apiGroups: ["api.equipment.hanserwei.github.io"]
+    resources: ["equipments", "equipmentgroups"]
+    verbs: ["get", "list"]
+
+---
+apiVersion: v1alpha1
+kind: Role
+metadata:
+  name: role-template-han-equipment-view
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/module: "Han 装备"
+    rbac.authorization.halo.run/ui-permissions: '["plugin:han-equipment:view"]'
+    rbac.authorization.halo.run/display-name: "Han 装备查看"
+rules:
+  - apiGroups: ["equipment.hanserwei.github.io", "console.api.equipment.hanserwei.github.io"]
+    resources: ["equipments", "equipmentgroups"]
+    verbs: ["get", "list"]
+---
+apiVersion: v1alpha1
+kind: Role
+metadata:
+  name: role-template-han-equipment-manage
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/dependencies: '["role-template-han-equipment-view"]'
+    rbac.authorization.halo.run/ui-permissions: '["plugin:han-equipment:manage"]'
+    rbac.authorization.halo.run/module: "Han 装备"
+    rbac.authorization.halo.run/display-name: "Han 装备管理"
+rules:
+  - apiGroups: ["equipment.hanserwei.github.io", "console.api.equipment.hanserwei.github.io"]
+    resources: ["equipments", "equipmentgroups"]
+    verbs: ["create", "patch", "update", "delete", "deletecollection"]

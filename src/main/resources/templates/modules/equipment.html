@@ -1,0 +1,26 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="list(groups)" class="equipment-showcase">
+    <section class="equipment-group" th:each="group : ${groups}" th:if="${not #lists.isEmpty(group.equipments)}">
+        <div class="equipment-group-heading">
+            <div>
+                <h2 class="equipment-group-title" th:text="${group.spec.displayName}">我的装备</h2>
+                <p
+                    class="equipment-group-description"
+                    th:if="${not #strings.isEmpty(group.spec.description)}"
+                    th:text="${group.spec.description}"
+                ></p>
+            </div>
+            <span class="equipment-group-count" th:text="${#lists.size(group.equipments) + ' 件装备'}">1 件装备</span>
+        </div>
+        <div class="equipment-grid">
+            <th:block th:each="equipment : ${group.equipments}">
+                <th:block th:replace="~{plugin:han-equipment:modules/card :: card(equipment=${equipment})}"></th:block>
+            </th:block>
+        </div>
+    </section>
+    <p
+        class="equipment-empty"
+        th:if="${#lists.isEmpty(groups) or #lists.isEmpty(groups.?[not #lists.isEmpty(equipments)])}"
+    >
+        装备清单正在准备中，敬请期待。
+    </p>
+</div>

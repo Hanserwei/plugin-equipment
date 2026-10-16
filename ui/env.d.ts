@@ -1,0 +1,25 @@
+/// <reference types="@rsbuild/core/types" />
+/// <reference types="unplugin-icons/types/vue" />
+
+export {};
+
+declare module "axios" {
+  export interface AxiosRequestConfig {
+    mute?: boolean;
+  }
+}
+
+declare module "vue" {
+  interface ComponentCustomProperties {
+    $formkit: any;
+  }
+}
+
+declare global {
+  interface Window {
+    enabledPlugins: {
+      name: string;
+      version: string;
+    }[];
+  }
+}

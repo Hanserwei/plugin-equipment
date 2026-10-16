@@ -1,0 +1,61 @@
+{
+  "name": "han-equipment-ui",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.25.0",
+  "engines": {
+    "node": ">=24.15.0"
+  },
+  "scripts": {
+    "build": "pnpm run type-check && pnpm run build-only",
+    "build-only": "rsbuild build",
+    "dev": "rsbuild build --watch --env-mode=development",
+    "lint": "oxlint src",
+    "prettier": "prettier --write src/",
+    "test:unit": "vitest run",
+    "type-check": "vue-tsc --build"
+  },
+  "prettier": {
+    "printWidth": 100,
+    "semi": true,
+    "singleQuote": false,
+    "tabWidth": 2
+  },
+  "dependencies": {
+    "@halo-dev/api-client": "2.26.0",
+    "@halo-dev/components": "2.26.0",
+    "@halo-dev/ui-shared": "2.26.0",
+    "@tanstack/vue-query": "^4.44.0",
+    "@vueuse/router": "^14.4.0",
+    "axios": "^1.20.0",
+    "fuse.js": "^7.5.0",
+    "lodash-es": "^4.18.1",
+    "vue": "^3.5.42",
+    "vue-router": "~5.1.0",
+    "vue-draggable-plus": "^0.6.1"
+  },
+  "devDependencies": {
+    "@formkit/vue": "^2.1.2",
+    "@halo-dev/ui-plugin-bundler-kit": "2.26.0",
+    "@iconify/json": "^2.2.525",
+    "@rsbuild/core": "^2.2.3",
+    "@rsbuild/plugin-vue": "^2.0.1",
+    "@tsconfig/node24": "^24.0.5",
+    "@types/jsdom": "^30.0.0",
+    "@types/lodash-es": "^4.17.12",
+    "@types/node": "^24.11.0",
+    "@types/sortablejs": "^1.15.9",
+    "@unocss/webpack": "^66.10.0",
+    "@vitejs/plugin-vue": "^6.0.8",
+    "@vue/test-utils": "^2.5.0",
+    "@vue/tsconfig": "^0.9.1",
+    "jsdom": "^30.0.1",
+    "oxlint": "^1.81.0",
+    "prettier": "^3.9.6",
+    "typescript": "~6.0.3",
+    "unocss": "^66.10.0",
+    "unplugin-icons": "^23.0.1",
+    "vitest": "^5.0.0",
+    "vue-tsc": "^3.3.11"
+  }
+}
