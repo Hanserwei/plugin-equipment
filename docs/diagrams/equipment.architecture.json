@@ -1,0 +1,238 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "装备清单：手动维护到主题展示",
+    "locale": "zh-CN",
+    "output": "docs/diagrams/equipment.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "git@github.com:Hanserwei/plugin-equipment.git",
+      "revision": "e4af645f6b4023fc52d86f394306253456a50db4",
+      "link_mode": "local-only"
+    }
+  },
+  "components": [
+    {
+      "id": "maintenance",
+      "type": "frontend",
+      "label": "Console / Halo CLI",
+      "sublabel": "人工填写 · CLI 为可选外部工具",
+      "pos": [
+        40,
+        40
+      ],
+      "size": [
+        240,
+        80
+      ],
+      "sources": [
+        {
+          "path": "ui/src/components/EquipmentEditingModal.vue",
+          "line": 97,
+          "end_line": 112
+        },
+        {
+          "path": "ui/src/components/GroupEditingModal.vue",
+          "line": 62,
+          "end_line": 74
+        }
+      ]
+    },
+    {
+      "id": "resource-api",
+      "type": "backend",
+      "label": "Halo 资源 API",
+      "sublabel": "认证后的创建、更新与删除",
+      "pos": [
+        400,
+        40
+      ],
+      "size": [
+        240,
+        80
+      ],
+      "sources": [
+        {
+          "path": "ui/src/components/EquipmentEditingModal.vue",
+          "line": 102,
+          "end_line": 112
+        },
+        {
+          "path": "ui/src/components/GroupEditingModal.vue",
+          "line": 62,
+          "end_line": 74
+        },
+        {
+          "path": "src/main/java/com/kunkunyu/equipment/EquipmentPlugin.java",
+          "line": 21,
+          "end_line": 54
+        }
+      ]
+    },
+    {
+      "id": "resources",
+      "type": "database",
+      "label": "Equipment / EquipmentGroup",
+      "sublabel": "Halo 扩展资源 · 按 groupName 关联",
+      "pos": [
+        760,
+        40
+      ],
+      "size": [
+        280,
+        80
+      ],
+      "sources": [
+        {
+          "path": "src/main/java/com/kunkunyu/equipment/Equipment.java",
+          "line": 19,
+          "end_line": 64
+        },
+        {
+          "path": "src/main/java/com/kunkunyu/equipment/EquipmentGroup.java",
+          "line": 13,
+          "end_line": 45
+        }
+      ]
+    },
+    {
+      "id": "finder",
+      "type": "backend",
+      "label": "hanEquipmentFinder",
+      "sublabel": "查询服务读取资源 · 分组与排序",
+      "pos": [
+        760,
+        280
+      ],
+      "size": [
+        280,
+        80
+      ],
+      "sources": [
+        {
+          "path": "src/main/java/com/kunkunyu/equipment/finders/impl/EquipmentFInderImpl.java",
+          "line": 71,
+          "end_line": 101
+        },
+        {
+          "path": "src/main/java/com/kunkunyu/equipment/finders/impl/EquipmentPublicQueryServiceImpl.java",
+          "line": 28,
+          "end_line": 52
+        }
+      ]
+    },
+    {
+      "id": "router",
+      "type": "backend",
+      "label": "/equipments",
+      "sublabel": "路由调用 Finder · 提供 groups",
+      "pos": [
+        400,
+        280
+      ],
+      "size": [
+        240,
+        80
+      ],
+      "sources": [
+        {
+          "path": "src/main/java/com/kunkunyu/equipment/EquipmentRouter.java",
+          "line": 50,
+          "end_line": 85
+        },
+        {
+          "path": "src/main/java/com/kunkunyu/equipment/EquipmentRouter.java",
+          "line": 113,
+          "end_line": 115
+        }
+      ]
+    },
+    {
+      "id": "theme",
+      "type": "frontend",
+      "label": "主题装备页",
+      "sublabel": "equipments.html · 主题优先",
+      "tag": "缺省使用插件内置页面",
+      "pos": [
+        40,
+        280
+      ],
+      "size": [
+        240,
+        80
+      ],
+      "sources": [
+        {
+          "path": "docs/theme-integration.md",
+          "line": 5,
+          "end_line": 7
+        },
+        {
+          "path": "src/main/resources/templates/equipments.html",
+          "line": 8,
+          "end_line": 17
+        },
+        {
+          "path": "src/main/resources/templates/modules/equipment.html",
+          "line": 1,
+          "end_line": 18
+        }
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "manual-write",
+      "from": "maintenance",
+      "to": "resource-api",
+      "label": "维护",
+      "variant": "emphasis"
+    },
+    {
+      "id": "persist",
+      "from": "resource-api",
+      "to": "resources",
+      "label": "写入",
+      "variant": "emphasis"
+    },
+    {
+      "id": "read",
+      "from": "finder",
+      "to": "resources",
+      "label": "读取"
+    },
+    {
+      "id": "query",
+      "from": "router",
+      "to": "finder",
+      "label": "查询"
+    },
+    {
+      "id": "render",
+      "from": "router",
+      "to": "theme",
+      "label": "渲染",
+      "variant": "emphasis"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "人工维护",
+      "items": [
+        "装备、参数与分组由使用者填写；不扫描硬件，不做实时监控。",
+        "Halo CLI 是可选外部客户端，与 Console 使用同一资源 API。"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "数据与展示",
+      "items": [
+        "Equipment.spec.groupName 对应 EquipmentGroup.metadata.name。",
+        "attributes 按数组顺序展示；模板复用插件卡片与样式。",
+        "Finder 在服务端读取资源，无需浏览器额外请求公开 REST API。"
+      ]
+    }
+  ]
+}

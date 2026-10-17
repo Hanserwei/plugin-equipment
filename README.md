@@ -32,6 +32,35 @@
 
 插件用于**手动维护的公开装备清单**，不提供硬件实时监控、自动设备扫描或 fastfetch 一键导入。
 
+## 从维护到展示
+
+![装备清单从 Console 或可选 Halo CLI 经资源 API 维护，再由 Finder、路由和主题模板展示](docs/diagrams/equipment.svg)
+
+Console 与可选的外部 [Halo CLI](https://github.com/Hanserwei/halo-cli) 通过资源 API 维护 `Equipment` / `EquipmentGroup`；CLI 不是插件内置功能。装备以 `spec.groupName` 关联分组的 `metadata.name`，配置参数 `attributes` 按数组顺序展示。
+
+访客访问 `/equipments` 时，路由调用 `hanEquipmentFinder`，在服务端查询并分组，向模板提供 `groups`。优先使用主题的 `equipments.html`，主题未提供时使用插件内置页面；主题也可复用插件卡片和样式。图中箭头标明维护、写入、读取、查询与渲染的方向。
+
+[PNG 图片](docs/diagrams/equipment.png) · [SVG 原图](docs/diagrams/equipment.svg) · [可复现图示源](docs/diagrams/equipment.architecture.json)
+
+<details>
+<summary>重新生成与导出图示</summary>
+
+图示使用 Archify 3.1.0，源文件包含对应代码版本和行号证据。在仓库根目录，将 `ARCHIFY_BIN` 指向 Archify 的 `bin/archify.mjs`，执行：
+
+```bash
+node "$ARCHIFY_BIN" finalize architecture \
+  docs/diagrams/equipment.architecture.json \
+  docs/diagrams/equipment.html \
+  --repo-root . --quality showcase \
+  --out-dir /tmp/archify-equipment-review --json
+```
+
+用浏览器打开生成的 `docs/diagrams/equipment.html`，选择「导出图表 → SVG · 自动」生成随宿主主题切换的独立 SVG；切换到浅色主题后，选择「PNG」导出完整图片。分别保存为 `docs/diagrams/equipment.svg` 和 `docs/diagrams/equipment.png`。图片导出不包含交互控件；无需运行 Halo 或扫描本机硬件。
+
+仓库保留 JSON 源与 SVG/PNG；生成的 HTML、delivery 元数据及校验回执仅用于本地预览和检查。修改实现后应同步更新图示内容及源文件中的代码版本和证据。
+
+</details>
+
 ## 安装
 
 运行插件需要 **Halo >= 2.26.0**。普通使用者不需要安装 Node.js、pnpm 或 Gradle。
